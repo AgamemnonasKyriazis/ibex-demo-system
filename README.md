@@ -30,6 +30,41 @@ probe is required.
 * screen
 * srecord
 
+
+## Add udev rules for our device
+
+**Linux/MacOS**
+
+These are needed for the programmer to access the development board.
+
+Arty-A7
+```bash
+
+sudo su
+cat <<EOF > /etc/udev/rules.d/90-arty-a7.rules
+# Future Technology Devices International, Ltd FT2232C/D/H Dual UART/FIFO IC
+# used on Digilent boards
+ACTION=="add|change", SUBSYSTEM=="usb|tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", ATTRS{manufacturer}=="Digilent", MODE="0666"
+
+# Future Technology Devices International, Ltd FT232 Serial (UART) IC
+ACTION=="add|change", SUBSYSTEM=="usb|tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="0666"
+EOF
+
+exit
+```
+
+Run the following to reload the rules...
+
+```bash
+sudo udevadm control --reload-rules
+sudo udevadm trigger
+```
+
+Add user to plugdev group.
+```bash
+sudo usermod -a $USER -G plugdev
+```
+
 ## Container Guide
 
 There is a prebuilt container of tools available you may want to use to get started quickly.
@@ -106,22 +141,6 @@ docker run -it --rm -p 6080:6080 -p 3333:3333 -v %cd%:/home/dev/demo:Z ibex
 
 #### Add udev rules for our device
 These are needed for the programmer to access the development board.
-
-Arty-A7
-```bash
-
-sudo su
-cat <<EOF > /etc/udev/rules.d/90-arty-a7.rules
-# Future Technology Devices International, Ltd FT2232C/D/H Dual UART/FIFO IC
-# used on Digilent boards
-ACTION=="add|change", SUBSYSTEM=="usb|tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6010", ATTRS{manufacturer}=="Digilent", MODE="0666"
-
-# Future Technology Devices International, Ltd FT232 Serial (UART) IC
-ACTION=="add|change", SUBSYSTEM=="usb|tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="0666"
-EOF
-
-exit
-```
 
 openFPGAloader
 ```bash
